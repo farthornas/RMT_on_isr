@@ -1,0 +1,28 @@
+menu "LED Configuration"
+
+    orsource "$IDF_PATH/examples/common_components/env_caps/$IDF_TARGET/Kconfig.env_caps"
+    
+    config LED_GPIO
+        int "LED GPIO output pin"
+        range ENV_GPIO_RANGE_MIN ENV_GPIO_OUT_RANGE_MAX
+        default 14 if IDF_TARGET_ESP32C2 || IDF_TARGET_ESP32H2
+        default 14
+        help
+            GPIO pin number to be used as GPIO_OUTPUT_LED.
+
+    config INPUT_GPIO
+        int "GPIO input pin 0"
+        range ENV_GPIO_RANGE_MIN ENV_GPIO_IN_RANGE_MAX
+        default 32
+        help
+            GPIO pin number to be used as GPIO_INPUT_IO_0.
+    
+    config TEST_GPIO
+        int "GPIO pin for testing interrupt by generating pulses on a GPIO"
+        range ENV_GPIO_RANGE_MIN ENV_GPIO_IN_RANGE_MAX
+        default 21
+        help
+            GPIO pin number to be used as TEST_GPIO.
+        
+
+endmenu
