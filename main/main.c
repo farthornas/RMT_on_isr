@@ -36,7 +36,7 @@ rmt_channel_handle_t rmt_chan = NULL;
 static rmt_encoder_handle_t copy_encoder = NULL;
 uint8_t num = 0;
 
-void init_rmt()
+void configure_rmt()
 {
     rmt_tx_channel_config_t tx_chan_config = {
         .gpio_num = OUTPUT_GPIO,
@@ -96,7 +96,8 @@ void rmt_send_number(uint8_t number)
 
 /* RMT setup and generation end */
 
-/* ISR setup and event handler */
+
+/* ISR task and event handler */
 
 static QueueHandle_t gpio_evt_queue = NULL;
 
@@ -122,56 +123,11 @@ static void edge_detect_task(void* arg)
     }
 }
 
-static void configure_isr(void)
-{
-    //zero-initialize the config structure.
-    gpio_config_t io_conf = {};
-    //disable interrupt
-    io_conf.intr_type = GPIO_INTR_DISABLE;
+/* ISR task and event handler end */
 
-    if (TEST){
-        printf("Setting up for tests\n");
-        io_conf.pin_bit_mask = OUTPUT_GPIO_TEST;
-        //set as input mode
-        io_conf.mode = GPIO_MODE_OUTPUT;
-        //enable pull-up mode
-        io_conf.pull_up_en = 0;
-        io_conf.pull_down_en = 0;
 
-    }
-    
-    //configure GPIO with the given settings
-    //interrupt of rising edge
-    io_conf.intr_type = GPIO_INTR_POSEDGE;
-    //bit mask of the pins, use GPIO4/5 here
-    io_conf.pin_bit_mask = INPUT_GPIO;
-    //set as input mode
-    io_conf.mode = GPIO_MODE_INPUT;
-    //enable pull-up mode
-    io_conf.pull_up_en = 1;
-    gpio_config(&io_conf);
-
-    //create a queue to handle gpio event from isr
-    gpio_evt_queue = xQueueCreate(10, sizeof(uint32_t));
-
-    //start gpio task
-    xTaskCreate(edge_detect_task, "edge_detect_task", 2048, NULL, 10, NULL);
-
-    //install gpio isr service
-    gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT);
-    //hook isr handler for specific gpio pin
-    gpio_isr_handler_add(INPUT_GPIO, gpio_isr_handler, (void*) INPUT_GPIO);
-}
-
-/* ISR setup and event handler  END */
-void app_main(void)
-{
-    init_rmt();
-    // configure_isr();
-    //zero-initialize the config structure.
-    gpio_config_t io_conf = {};
-    //disable interrupt
-    io_conf.intr_type = GPIO_INTR_DISABLE;
+/* GPIO setup */
+static void configure_gpio(void){
 
     if (TEST){
         gpio_config_t out_conf = {
@@ -183,17 +139,24 @@ void app_main(void)
         };
         gpio_config(&out_conf);
     }
-    
+
+    // Configure gpio input with interupt
     gpio_config_t in_conf = {
         .pin_bit_mask = (1ULL << INPUT_GPIO),
         .mode = GPIO_MODE_INPUT,
         .pull_up_en = 1,
         .pull_down_en = 0,
         .intr_type = GPIO_INTR_POSEDGE,
-    };
-
+    };  
     gpio_config(&in_conf);
 
+}
+/* GPIO setup end */
+
+
+/* ISR setup and event handler */
+static void configure_isr(void)
+{
     //create a queue to handle gpio event from isr
     gpio_evt_queue = xQueueCreate(10, sizeof(uint32_t));
 
@@ -205,9 +168,20 @@ void app_main(void)
     gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT);
     //hook isr handler for specific gpio pin
     gpio_isr_handler_add(INPUT_GPIO, gpio_isr_handler, (void*) INPUT_GPIO);
+}
+/* ISR setup and event handler  END */
 
+
+void app_main(void)
+{
+        
     int cnt = 0;
     uint32_t gpio_num = OUTPUT_GPIO_TEST;
+    
+    configure_rmt();
+    configure_gpio();
+    configure_isr();
+
     while (1) {
         /* Toggle the LED state */
         printf("cnt: %d\n", cnt++);
