@@ -2,6 +2,3 @@
 .devcontainer
 build
 .clangd
-CMakeLists.txt
-sdkconfig
-sdkconfig.old
