@@ -54,6 +54,34 @@ void preload_rmt_patterns()
     }
 }
 
+void load_rmt_pattern(uint8_t value)
+{
+    switch (value)
+    {
+    case 5:
+    // Bit 2 (MSB)
+        rmt_items[0].level0 = 1;
+        rmt_items[0].duration0 = 3;
+        rmt_items[0].level1 = 0;
+        rmt_items[0].duration1 = 3;
+
+        // Bit 1
+        rmt_items[1].level0 = 0;
+        rmt_items[1].duration0 = 3;
+        rmt_items[1].level1 = 0;
+        rmt_items[1].duration1 = 3;
+
+        // Bit 0 (LSB)
+        rmt_items[2].level0 = 1;
+        rmt_items[2].duration0 = 3;
+        rmt_items[2].level1 = 0;
+        rmt_items[2].duration1 = 3;        
+        break;
+    
+    default:
+        break;
+    }
+}
 
 //void load_rmt_pattern_to_hw(uint8_t value)
 //{
@@ -89,23 +117,24 @@ void configure_rmt_legacy()
 
     // Prepare 10 µs high + 10 µs low pulse
 
-    // Bit 2 (MSB)
-    rmt_items[0].level0 = 1;
-    rmt_items[0].duration0 = 3;
-    rmt_items[0].level1 = 0;
-    rmt_items[0].duration1 = 3;
-
-    // Bit 1
-    rmt_items[1].level0 = 0;
-    rmt_items[1].duration0 = 3;
-    rmt_items[1].level1 = 0;
-    rmt_items[1].duration1 = 3;
-
-    // Bit 0 (LSB)
-    rmt_items[2].level0 = 1;
-    rmt_items[2].duration0 = 3;
-    rmt_items[2].level1 = 0;
-    rmt_items[2].duration1 = 3;
+    //// Bit 2 (MSB)
+    //rmt_items[0].level0 = 1;
+    //rmt_items[0].duration0 = 3;
+    //rmt_items[0].level1 = 0;
+    //rmt_items[0].duration1 = 3;
+//
+    //// Bit 1
+    //rmt_items[1].level0 = 0;
+    //rmt_items[1].duration0 = 3;
+    //rmt_items[1].level1 = 0;
+    //rmt_items[1].duration1 = 3;
+//
+    //// Bit 0 (LSB)
+    //rmt_items[2].level0 = 1;
+    //rmt_items[2].duration0 = 3;
+    //rmt_items[2].level1 = 0;
+    //rmt_items[2].duration1 = 3;
+    load_rmt_pattern(5);
 
     rmt_write_items(RMT_CHANNEL, rmt_items, BITS_PER_SYMBOL, false); // Pre-load only
 }
