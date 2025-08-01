@@ -21,7 +21,7 @@
 
 #define BITS_PER_SYMBOL 3
 
-DRAM_ATTR static rmt_item32_t rmt_items[3];  // 1 pulse
+DRAM_ATTR static rmt_item32_t rmt_items[BITS_PER_SYMBOL];  // 1 pulse
 
 // Fast ISR: start RMT TX by setting tx_start bit directly
 IRAM_ATTR static void gpio_isr_handler(void* arg) {
@@ -89,25 +89,25 @@ void configure_rmt_legacy()
 
     // Prepare 10 µs high + 10 µs low pulse
 
-    // Bit 1 (MSB)
+    // Bit 2 (MSB)
     rmt_items[0].level0 = 1;
-    rmt_items[0].duration0 = 5;
+    rmt_items[0].duration0 = 3;
     rmt_items[0].level1 = 0;
-    rmt_items[0].duration1 = 5;
+    rmt_items[0].duration1 = 3;
 
-    // Bit 0
-    rmt_items[1].level0 = 1;
-    rmt_items[1].duration0 = 1;
+    // Bit 1
+    rmt_items[1].level0 = 0;
+    rmt_items[1].duration0 = 3;
     rmt_items[1].level1 = 0;
-    rmt_items[1].duration1 = 5;
+    rmt_items[1].duration1 = 3;
 
-    // Bit 1 (LSB)
+    // Bit 0 (LSB)
     rmt_items[2].level0 = 1;
-    rmt_items[2].duration0 = 5;
+    rmt_items[2].duration0 = 3;
     rmt_items[2].level1 = 0;
-    rmt_items[2].duration1 = 5;
+    rmt_items[2].duration1 = 3;
 
-    rmt_write_items(RMT_CHANNEL, rmt_items, 3, false); // Pre-load only
+    rmt_write_items(RMT_CHANNEL, rmt_items, BITS_PER_SYMBOL, false); // Pre-load only
 }
 
 void configure_gpio_isr()
